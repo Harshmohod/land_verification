@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Land Verification System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-landmark"></i>
+                <span>Land Verification System</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#home" class="nav-link">Home</a>
+                <a href="#about" class="nav-link">About</a>
+                <a href="#contact" class="nav-link">Contact</a>
+                <button class="login-btn" onclick="openLoginModal()">Login</button>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <h1>Digital Land Verification System</h1>
+                <p>Streamlined land document verification process for citizens, tehsildars, and administrators</p>
+                <div class="hero-buttons">
+                    <button class="btn-primary" onclick="openLoginModal()">Get Started</button>
+                    <button class="btn-secondary" onclick="scrollToSection('about')">Learn More</button>
+                </div>
+            </div>
+            <div class="hero-image">
+                <i class="fas fa-file-contract"></i>
+            </div>
+        </section>
+
+        <section id="about" class="features">
+            <h2>How It Works</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-user"></i>
+                    <h3>Citizen Upload</h3>
+                    <p>Upload your land documents for verification through our secure portal</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-user-tie"></i>
+                    <h3>Tehsildar Review</h3>
+                    <p>Regional tehsildars review and verify documents for their jurisdiction</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>Secure Verification</h3>
+                    <p>Get instant verification status with secure digital signatures</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="contact">
+            <h2>Contact Us</h2>
+            <p>For support and inquiries, please contact your local tehsildar office</p>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeLoginModal()">&times;</span>
+            <div class="login-container">
+                <h2>Login</h2>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="userType">Login As:</label>
+                        <select id="userType" required>
+                            <option value="">Select User Type</option>
+                            <option value="citizen">Citizen</option>
+                            <option value="tehsildar">Tehsildar</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Username/Email:</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password:</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                <p>Don't have an account? <a href="#" onclick="openRegisterModal()">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRegisterModal()">&times;</span>
+            <div class="register-container">
+                <h2>Register</h2>
+                <form id="registerForm" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="regUserType">Register As:</label>
+                        <select id="regUserType" required>
+                            <option value="">Select User Type</option>
+                            <option value="citizen">Citizen</option>
+                            <option value="tehsildar">Tehsildar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="regName">Full Name:</label>
+                        <input type="text" id="regName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regEmail">Email:</label>
+                        <input type="email" id="regEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regPassword">Password:</label>
+                        <input type="password" id="regPassword" required>
+                    </div>
+                    <div class="form-group" id="pincodeGroup" style="display: none;">
+                        <label for="regPincode">Region Pincode:</label>
+                        <input type="text" id="regPincode" pattern="[0-9]{6}" placeholder="Enter 6-digit pincode">
+                    </div>
+                    <button type="submit" class="btn-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
