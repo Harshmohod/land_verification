@@ -187,9 +187,14 @@ function createCitizenDashboard() {
                                     <div class="document-title">${doc.title}</div>
                                     <div class="document-date">Uploaded: ${new Date(doc.uploadDate).toLocaleDateString()}</div>
                                     ${doc.status === 'rejected' ? `<div class="document-issue">Issue: ${doc.issue}</div>` : ''}
+                                    ${doc.review ? `<div class="document-review"><strong>Tehsildar Review:</strong> ${doc.review}</div>` : ''}
+                                    ${doc.status === 'approved' ? `<div class="document-review approved"><strong>Status:</strong> Document approved by ${getUserName(doc.verifiedBy)}</div>` : ''}
                                 </div>
-                                <div class="document-status status-${doc.status}">
-                                    ${getStatusIcon(doc.status)} ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                <div class="document-actions">
+                                    <button class="btn-secondary" onclick="previewDocument(${doc.id})">View Document</button>
+                                    <div class="document-status status-${doc.status}">
+                                        ${getStatusIcon(doc.status)} ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
@@ -239,9 +244,11 @@ function createTehsildarDashboard() {
                                     <div class="document-title">${doc.title}</div>
                                     <div class="document-date">Uploaded: ${new Date(doc.uploadDate).toLocaleDateString()}</div>
                                     <div class="document-user">By: ${getUserName(doc.userId)}</div>
+                                    ${doc.review ? `<div class="document-review"><strong>Your Review:</strong> ${doc.review}</div>` : ''}
                                 </div>
                                 <div class="document-actions">
                                     ${doc.status === 'pending' ? `
+                                        <button class="btn-primary" onclick="previewDocument(${doc.id})">View Document</button>
                                         <button class="btn-primary" onclick="verifyDocument(${doc.id}, 'approved')">Approve</button>
                                         <button class="btn-secondary" onclick="showRejectModal(${doc.id})">Reject</button>
                                     ` : `
@@ -303,9 +310,14 @@ function createAdminDashboard() {
                                     <div class="document-title">${doc.title}</div>
                                     <div class="document-date">Uploaded: ${new Date(doc.uploadDate).toLocaleDateString()}</div>
                                     <div class="document-user">By: ${getUserName(doc.userId)} | Region: ${doc.pincode}</div>
+                                    ${doc.review ? `<div class="document-review"><strong>Review:</strong> ${doc.review}</div>` : ''}
+                                    ${doc.issue ? `<div class="document-issue">Issue: ${doc.issue}</div>` : ''}
                                 </div>
-                                <div class="document-status status-${doc.status}">
-                                    ${getStatusIcon(doc.status)} ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                <div class="document-actions">
+                                    <button class="btn-secondary" onclick="previewDocument(${doc.id})">View Document</button>
+                                    <div class="document-status status-${doc.status}">
+                                        ${getStatusIcon(doc.status)} ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}
+                                    </div>
                                 </div>
                             </div>
                         `).join('')}
@@ -321,21 +333,29 @@ function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    const newDocument = {
-        id: documents.length + 1,
-        userId: currentUser.id,
-        title: file.name,
-        fileName: file.name,
-        uploadDate: new Date().toISOString(),
-        status: 'pending',
-        pincode: currentUser.pincode || '400001' // Default pincode
+    // Create a FileReader to store the file content
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const newDocument = {
+            id: documents.length + 1,
+            userId: currentUser.id,
+            title: file.name,
+            fileName: file.name,
+            fileContent: e.target.result, // Store the file content
+            fileType: file.type,
+            uploadDate: new Date().toISOString(),
+            status: 'pending',
+            pincode: currentUser.pincode || '400001' // Default pincode
+        };
+        
+        documents.push(newDocument);
+        localStorage.setItem('documents', JSON.stringify(documents));
+        
+        showMessage('Document uploaded successfully!', 'success');
+        showDashboard(); // Refresh dashboard
     };
     
-    documents.push(newDocument);
-    localStorage.setItem('documents', JSON.stringify(documents));
-    
-    showMessage('Document uploaded successfully!', 'success');
-    showDashboard(); // Refresh dashboard
+    reader.readAsDataURL(file); // Read file as base64
 }
 
 // Verify document (for tehsildar)
@@ -351,11 +371,68 @@ function verifyDocument(docId, status) {
             if (issue) {
                 doc.issue = issue;
             }
+        } else if (status === 'approved') {
+            const review = prompt('Please provide a review comment (optional):');
+            if (review) {
+                doc.review = review;
+            }
         }
         
         localStorage.setItem('documents', JSON.stringify(documents));
         showMessage(`Document ${status}!`, 'success');
         showDashboard(); // Refresh dashboard
+    }
+}
+
+// Preview document
+function previewDocument(docId) {
+    const doc = documents.find(d => d.id === docId);
+    if (doc && doc.fileContent) {
+        // Create modal for document preview
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.style.display = 'block';
+        
+        let content = '';
+        if (doc.fileType.startsWith('image/')) {
+            content = `<img src="${doc.fileContent}" alt="${doc.title}" style="max-width: 100%; height: auto;">`;
+        } else if (doc.fileType === 'application/pdf') {
+            content = `<iframe src="${doc.fileContent}" width="100%" height="600px" style="border: none;"></iframe>`;
+        } else {
+            content = `<p>Document preview not available for this file type.</p>
+                      <p><strong>File:</strong> ${doc.title}</p>
+                      <a href="${doc.fileContent}" download="${doc.title}" class="btn-primary">Download Document</a>`;
+        }
+        
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 90%; max-height: 90%; overflow-y: auto;">
+                <span class="close" onclick="this.parentElement.parentElement.remove()">&times;</span>
+                <div class="document-preview">
+                    <h3>${doc.title}</h3>
+                    <div class="preview-content">
+                        ${content}
+                    </div>
+                    <div class="document-details">
+                        <p><strong>Uploaded by:</strong> ${getUserName(doc.userId)}</p>
+                        <p><strong>Upload date:</strong> ${new Date(doc.uploadDate).toLocaleDateString()}</p>
+                        <p><strong>Status:</strong> ${doc.status.charAt(0).toUpperCase() + doc.status.slice(1)}</p>
+                        ${doc.review ? `<p><strong>Review:</strong> ${doc.review}</p>` : ''}
+                        ${doc.issue ? `<p><strong>Issue:</strong> ${doc.issue}</p>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Close modal when clicking outside
+        modal.onclick = function(event) {
+            if (event.target === modal) {
+                modal.remove();
+            }
+        };
+    } else {
+        showMessage('Document not found or no preview available.', 'error');
     }
 }
 

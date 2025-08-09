@@ -630,3 +630,56 @@ main {
 .tehsildar-info p:last-child {
     margin-bottom: 0;
 }
+
+/* Document Preview Styles */
+.document-preview {
+    padding: 1rem;
+}
+
+.document-preview h3 {
+    color: #333;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.preview-content {
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.preview-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.document-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+.document-details p {
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.document-review {
+    background: #e3f2fd;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    border-left: 3px solid #2196f3;
+    font-size: 0.9rem;
+}
+
+.document-review.approved {
+    background: #e8f5e8;
+    border-left-color: #4caf50;
+}
+
+.document-review strong {
+    color: #333;
+}

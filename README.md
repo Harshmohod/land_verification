@@ -5,19 +5,26 @@ A comprehensive digital land verification system that allows citizens to upload 
 ## Features
 
 ### 🏠 **Citizen Portal**
+
 - **User Registration & Login**: Citizens can register and login to the system
 - **Document Upload**: Upload land verification documents (PDF, JPG, JPEG, PNG)
 - **Status Tracking**: Real-time tracking of document verification status
 - **Document History**: View all uploaded documents with their current status
 - **Issue Notifications**: See specific issues if documents are rejected
+- **Document Preview**: View uploaded documents in the browser
+- **Tehsildar Reviews**: See detailed reviews and comments from tehsildars
 
 ### 👨‍💼 **Tehsildar Portal**
+
 - **Region-based Access**: Tehsildars only see documents from their assigned region (pincode)
 - **Document Verification**: Approve or reject documents with issue specification
+- **Document Preview**: View and examine uploaded documents before verification
+- **Review System**: Provide detailed reviews and comments for approved documents
 - **Dashboard Overview**: View pending, approved, and rejected documents for their region
 - **Daily Statistics**: Track daily verification activities
 
 ### 🔧 **Admin Portal**
+
 - **System Overview**: View all documents across all regions
 - **User Management**: Monitor all registered users
 - **Regional Statistics**: Comprehensive overview of all regions
@@ -26,11 +33,13 @@ A comprehensive digital land verification system that allows citizens to upload 
 ## Default Login Credentials
 
 ### Admin
+
 - **Username**: admin
 - **Password**: admin123
 - **Access**: Full system overview
 
 ### Tehsildars
+
 - **Username**: tehsildar1
 - **Password**: tehsildar123
 - **Region**: Mumbai (400001)
@@ -52,6 +61,7 @@ A comprehensive digital land verification system that allows citizens to upload 
 - **Region**: Hyderabad (500001)
 
 ### Citizens
+
 - **Username**: citizen1
 - **Password**: citizen123
 - **Region**: Mumbai (400001)
@@ -63,12 +73,14 @@ A comprehensive digital land verification system that allows citizens to upload 
 ## How to Use
 
 ### For Citizens:
+
 1. **Register/Login**: Create an account or login with existing credentials
 2. **Upload Documents**: Click the upload area to select and upload land verification documents
 3. **Track Status**: Monitor the status of your documents (Pending/Approved/Rejected)
 4. **View Issues**: If a document is rejected, you'll see the specific issue mentioned
 
 ### For Tehsildars:
+
 1. **Login**: Use your tehsildar credentials to login
 2. **View Region Documents**: See only documents from your assigned region
 3. **Verify Documents**: Click "Approve" or "Reject" for pending documents
@@ -76,6 +88,7 @@ A comprehensive digital land verification system that allows citizens to upload 
 5. **Monitor Statistics**: Track daily verification activities
 
 ### For Administrators:
+
 1. **Login**: Use admin credentials to access the system
 2. **System Overview**: View comprehensive statistics across all regions
 3. **Monitor Activity**: Track all documents and user activities
@@ -84,21 +97,25 @@ A comprehensive digital land verification system that allows citizens to upload 
 ## Technical Features
 
 ### 🔒 **Security**
+
 - User authentication and authorization
 - Region-based access control for tehsildars
 - Secure document handling
 
 ### 📱 **Responsive Design**
+
 - Mobile-friendly interface
 - Modern UI with smooth animations
 - Cross-browser compatibility
 
 ### 💾 **Data Persistence**
+
 - Local storage for demo purposes
 - Document and user data management
 - Status tracking and history
 
 ### 🎨 **User Experience**
+
 - Intuitive navigation
 - Real-time status updates
 - Clear visual indicators (green tick for approved, red mark for rejected)
@@ -137,17 +154,20 @@ land_verification/
 ## Demo Scenarios
 
 ### Scenario 1: Citizen Upload
+
 1. Login as a citizen
 2. Upload a document
 3. See it appear in pending status
 
 ### Scenario 2: Tehsildar Verification
+
 1. Login as a tehsildar from the same region
 2. View the pending document
 3. Approve or reject with comments
 4. Citizen sees updated status
 
 ### Scenario 3: Admin Overview
+
 1. Login as admin
 2. View all documents across regions
 3. Monitor system statistics
@@ -160,7 +180,7 @@ land_verification/
 - Email notifications
 - Advanced document validation
 - Digital signature integration
-- Mobile app development
+- Mobile app developmentSs
 - API endpoints for external integrations
 
 ---
