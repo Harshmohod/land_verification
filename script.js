@@ -9,7 +9,11 @@ if (users.length === 0) {
         { id: 1, username: 'admin', password: 'admin123', userType: 'admin', name: 'System Admin' },
         { id: 2, username: 'tehsildar1', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Mumbai', pincode: '400001' },
         { id: 3, username: 'tehsildar2', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Delhi', pincode: '110001' },
-        { id: 4, username: 'citizen1', password: 'citizen123', userType: 'citizen', name: 'John Doe', pincode: '400001' }
+        { id: 4, username: 'tehsildar3', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Kolkata', pincode: '700001' },
+        { id: 5, username: 'tehsildar4', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Chennai', pincode: '600001' },
+        { id: 6, username: 'tehsildar5', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Hyderabad', pincode: '500001' },
+        { id: 7, username: 'citizen1', password: 'citizen123', userType: 'citizen', name: 'John Doe', pincode: '400001' },
+        { id: 8, username: 'citizen2', password: 'citizen123', userType: 'citizen', name: 'Jane Smith', pincode: '110001' }
     ];
     localStorage.setItem('users', JSON.stringify(users));
 }
@@ -38,7 +42,7 @@ function closeRegisterModal() {
 // Handle register form user type change
 document.getElementById('regUserType').addEventListener('change', function() {
     const pincodeGroup = document.getElementById('pincodeGroup');
-    if (this.value === 'tehsildar') {
+    if (this.value === 'tehsildar' || this.value === 'citizen') {
         pincodeGroup.style.display = 'block';
         document.getElementById('regPincode').required = true;
     } else {
@@ -124,12 +128,14 @@ function showDashboard() {
 // Create citizen dashboard
 function createCitizenDashboard() {
     const userDocuments = documents.filter(doc => doc.userId === currentUser.id);
+    const assignedTehsildar = users.find(u => u.userType === 'tehsildar' && u.pincode === currentUser.pincode);
     
     return `
         <div class="dashboard">
             <div class="dashboard-header">
                 <h1>Welcome, ${currentUser.name}!</h1>
                 <p>Citizen Dashboard - Upload and track your land verification documents</p>
+                <p><strong>Your Region:</strong> ${currentUser.pincode} | <strong>Assigned Tehsildar:</strong> ${assignedTehsildar ? assignedTehsildar.name : 'Not Assigned'}</p>
             </div>
             <div class="dashboard-content">
                 <div class="dashboard-grid">
@@ -158,6 +164,15 @@ function createCitizenDashboard() {
                                 <span class="status-dot rejected"></span>
                                 <span>Rejected: ${userDocuments.filter(doc => doc.status === 'rejected').length}</span>
                             </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card">
+                        <h3><i class="fas fa-user-tie"></i> Your Tehsildar</h3>
+                        <p>Contact information for your assigned tehsildar</p>
+                        <div class="tehsildar-info">
+                            <p><strong>Name:</strong> ${assignedTehsildar ? assignedTehsildar.name : 'Not Assigned'}</p>
+                            <p><strong>Region:</strong> ${currentUser.pincode}</p>
+                            <p><strong>Status:</strong> ${assignedTehsildar ? 'Active' : 'No Tehsildar Assigned'}</p>
                         </div>
                     </div>
                 </div>

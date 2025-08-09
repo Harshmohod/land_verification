@@ -39,10 +39,26 @@ A comprehensive digital land verification system that allows citizens to upload 
 - **Password**: tehsildar123
 - **Region**: Delhi (110001)
 
-### Citizen
+- **Username**: tehsildar3
+- **Password**: tehsildar123
+- **Region**: Kolkata (700001)
+
+- **Username**: tehsildar4
+- **Password**: tehsildar123
+- **Region**: Chennai (600001)
+
+- **Username**: tehsildar5
+- **Password**: tehsildar123
+- **Region**: Hyderabad (500001)
+
+### Citizens
 - **Username**: citizen1
 - **Password**: citizen123
 - **Region**: Mumbai (400001)
+
+- **Username**: citizen2
+- **Password**: citizen123
+- **Region**: Delhi (110001)
 
 ## How to Use
 

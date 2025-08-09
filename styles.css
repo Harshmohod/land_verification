@@ -610,3 +610,23 @@ main {
     color: #666;
     font-size: 0.9rem;
 }
+
+.tehsildar-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+}
+
+.tehsildar-info p {
+    margin: 0.5rem 0;
+    color: #333;
+}
+
+.tehsildar-info p:first-child {
+    margin-top: 0;
+}
+
+.tehsildar-info p:last-child {
+    margin-bottom: 0;
+}
