@@ -1,188 +1,185 @@
 # Land Verification System
 
-A comprehensive digital land verification system that allows citizens to upload documents, tehsildars to verify them, and administrators to oversee the entire process.
+A digital land document verification system for citizens, tehsildars, and administrators with full backend connectivity and database management.
 
 ## Features
 
-### 🏠 **Citizen Portal**
+- **User Management**: Registration and authentication for citizens, tehsildars, and administrators
+- **Document Upload**: Secure file upload with support for images, PDFs, and documents
+- **Document Verification**: Tehsildars can review and verify documents in their region
+- **Real-time Tracking**: Track document status and verification progress
+- **Admin Dashboard**: Comprehensive overview of all users and documents
+- **Database Storage**: SQLite database for persistent data storage
+- **JWT Authentication**: Secure token-based authentication
 
-- **User Registration & Login**: Citizens can register and login to the system
-- **Document Upload**: Upload land verification documents (PDF, JPG, JPEG, PNG)
-- **Status Tracking**: Real-time tracking of document verification status
-- **Document History**: View all uploaded documents with their current status
-- **Issue Notifications**: See specific issues if documents are rejected
-- **Document Preview**: View uploaded documents in the browser
-- **Tehsildar Reviews**: See detailed reviews and comments from tehsildars
+## Prerequisites
 
-### 👨‍💼 **Tehsildar Portal**
+- Node.js (v14 or higher)
+- npm or yarn package manager
 
-- **Region-based Access**: Tehsildars only see documents from their assigned region (pincode)
-- **Document Verification**: Approve or reject documents with issue specification
-- **Document Preview**: View and examine uploaded documents before verification
-- **Review System**: Provide detailed reviews and comments for approved documents
-- **Dashboard Overview**: View pending, approved, and rejected documents for their region
-- **Daily Statistics**: Track daily verification activities
+## Installation
 
-### 🔧 **Admin Portal**
+1. **Clone or navigate to the project directory**
+   ```bash
+   cd land_verification
+   ```
 
-- **System Overview**: View all documents across all regions
-- **User Management**: Monitor all registered users
-- **Regional Statistics**: Comprehensive overview of all regions
-- **Read-only Access**: Can view but cannot modify documents (as per requirements)
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-## Default Login Credentials
+3. **Start the server**
+   ```bash
+   npm start
+   ```
+
+4. **Access the application**
+   Open your browser and go to: `http://localhost:3000`
+
+## Default Users
+
+The system comes with pre-configured users for testing:
 
 ### Admin
-
 - **Username**: admin
 - **Password**: admin123
-- **Access**: Full system overview
+- **Access**: Full system access, user management, statistics
 
 ### Tehsildars
-
-- **Username**: tehsildar1
+- **Username**: tehsildar1, tehsildar2, tehsildar3, tehsildar4, tehsildar5
 - **Password**: tehsildar123
-- **Region**: Mumbai (400001)
+- **Regions**: Mumbai (400001), Delhi (110001), Kolkata (700001), Chennai (600001), Hyderabad (500001)
 
-- **Username**: tehsildar2
-- **Password**: tehsildar123
-- **Region**: Delhi (110001)
+## API Endpoints
 
-- **Username**: tehsildar3
-- **Password**: tehsildar123
-- **Region**: Kolkata (700001)
+### Authentication
+- `POST /api/register` - User registration
+- `POST /api/login` - User login
 
-- **Username**: tehsildar4
-- **Password**: tehsildar123
-- **Region**: Chennai (600001)
+### User Management (Admin Only)
+- `GET /api/users` - Get all users
+- `GET /api/stats` - Get system statistics
+- `GET /api/tehsildars` - Get all tehsildars
 
-- **Username**: tehsildar5
-- **Password**: tehsildar123
-- **Region**: Hyderabad (500001)
+### Document Management
+- `POST /api/documents/upload` - Upload document
+- `GET /api/documents` - Get documents (filtered by user type)
+- `PUT /api/documents/:id/verify` - Verify document (Tehsildar only)
 
-### Citizens
+## Database Schema
 
-- **Username**: citizen1
-- **Password**: citizen123
-- **Region**: Mumbai (400001)
+### Users Table
+- `id` - Primary key
+- `username` - Unique username/email
+- `password` - Hashed password
+- `userType` - citizen, tehsildar, or admin
+- `name` - Full name
+- `email` - Email address
+- `pincode` - Region pincode
+- `phone` - Phone number
+- `address` - Address
+- `createdAt` - Registration timestamp
+- `updatedAt` - Last update timestamp
 
-- **Username**: citizen2
-- **Password**: citizen123
-- **Region**: Delhi (110001)
+### Documents Table
+- `id` - Primary key
+- `userId` - Foreign key to users table
+- `title` - Document title
+- `fileName` - Original filename
+- `filePath` - Server file path
+- `fileType` - MIME type
+- `fileSize` - File size in bytes
+- `uploadDate` - Upload timestamp
+- `status` - pending, approved, or rejected
+- `pincode` - Region pincode
+- `verifiedBy` - Foreign key to users table (tehsildar)
+- `verificationDate` - Verification timestamp
+- `review` - Tehsildar review comment
+- `issue` - Rejection reason
 
-## How to Use
+## User Roles
 
-### For Citizens:
+### Citizen
+- Register and login
+- Upload land documents
+- Track document status
+- View tehsildar information
 
-1. **Register/Login**: Create an account or login with existing credentials
-2. **Upload Documents**: Click the upload area to select and upload land verification documents
-3. **Track Status**: Monitor the status of your documents (Pending/Approved/Rejected)
-4. **View Issues**: If a document is rejected, you'll see the specific issue mentioned
+### Tehsildar
+- Login with regional access
+- Review documents in their region
+- Approve or reject documents
+- Add review comments
 
-### For Tehsildars:
+### Admin
+- Full system access
+- View all users and documents
+- Access system statistics
+- Monitor regional activities
 
-1. **Login**: Use your tehsildar credentials to login
-2. **View Region Documents**: See only documents from your assigned region
-3. **Verify Documents**: Click "Approve" or "Reject" for pending documents
-4. **Specify Issues**: When rejecting, provide specific reasons for rejection
-5. **Monitor Statistics**: Track daily verification activities
+## File Upload
 
-### For Administrators:
+Supported file types:
+- Images: JPEG, JPG, PNG
+- Documents: PDF, DOC, DOCX
+- Maximum file size: 10MB
 
-1. **Login**: Use admin credentials to access the system
-2. **System Overview**: View comprehensive statistics across all regions
-3. **Monitor Activity**: Track all documents and user activities
-4. **Regional Analysis**: View detailed breakdown by region
+## Security Features
 
-## Technical Features
+- Password hashing with bcrypt
+- JWT token authentication
+- File type validation
+- File size limits
+- CORS protection
+- Input validation
 
-### 🔒 **Security**
+## Development
 
-- User authentication and authorization
-- Region-based access control for tehsildars
-- Secure document handling
+To run in development mode with auto-restart:
+```bash
+npm run dev
+```
 
-### 📱 **Responsive Design**
+## Environment Variables
 
-- Mobile-friendly interface
-- Modern UI with smooth animations
-- Cross-browser compatibility
+Create a `.env` file in the root directory:
+```
+PORT=3000
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+NODE_ENV=development
+```
 
-### 💾 **Data Persistence**
-
-- Local storage for demo purposes
-- Document and user data management
-- Status tracking and history
-
-### 🎨 **User Experience**
-
-- Intuitive navigation
-- Real-time status updates
-- Clear visual indicators (green tick for approved, red mark for rejected)
-- Helpful notifications and messages
-
-## File Structure
+## Project Structure
 
 ```
 land_verification/
-├── index.html          # Main landing page
-├── styles.css          # CSS styles and responsive design
-├── script.js           # JavaScript functionality
-└── README.md          # This documentation
+├── server.js              # Main server file
+├── package.json           # Dependencies and scripts
+├── index.html             # Frontend HTML
+├── script.js              # Frontend JavaScript
+├── styles.css             # Frontend styles
+├── database.sqlite        # SQLite database (created automatically)
+├── uploads/               # Uploaded files directory
+├── config.env             # Environment variables
+└── README.md              # This file
 ```
 
-## Status Indicators
+## Troubleshooting
 
-- **🟡 Pending**: Document is awaiting verification
-- **🟢 Approved**: Document has been verified and approved (green tick)
-- **🔴 Rejected**: Document has been rejected with specific issues (red mark)
+1. **Port already in use**: Change the PORT in config.env
+2. **Database errors**: Delete database.sqlite and restart server
+3. **Upload failures**: Check uploads directory permissions
+4. **Authentication errors**: Clear browser localStorage and login again
 
-## Browser Compatibility
+## Contributing
 
-- Chrome (recommended)
-- Firefox
-- Safari
-- Edge
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
 
-## Getting Started
+## License
 
-1. Open `index.html` in a web browser
-2. Register as a new user or login with default credentials
-3. Explore the different user roles and their capabilities
-4. Test document upload and verification processes
-
-## Demo Scenarios
-
-### Scenario 1: Citizen Upload
-
-1. Login as a citizen
-2. Upload a document
-3. See it appear in pending status
-
-### Scenario 2: Tehsildar Verification
-
-1. Login as a tehsildar from the same region
-2. View the pending document
-3. Approve or reject with comments
-4. Citizen sees updated status
-
-### Scenario 3: Admin Overview
-
-1. Login as admin
-2. View all documents across regions
-3. Monitor system statistics
-4. Track regional activities
-
-## Future Enhancements
-
-- Database integration for production use
-- File upload to cloud storage
-- Email notifications
-- Advanced document validation
-- Digital signature integration
-- Mobile app developmentSs
-- API endpoints for external integrations
-
----
-
-**Note**: This is a demo system using local storage. For production use, implement proper backend services, database, and security measures.
+This project is licensed under the MIT License.

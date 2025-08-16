@@ -1,21 +1,37 @@
 // Global variables
 let currentUser = null;
-let documents = JSON.parse(localStorage.getItem('documents')) || [];
-let users = JSON.parse(localStorage.getItem('users')) || [];
+let documents = [];
+let users = [];
+let authToken = localStorage.getItem('authToken');
 
-// Initialize with default users if empty
-if (users.length === 0) {
-    users = [
-        { id: 1, username: 'admin', password: 'admin123', userType: 'admin', name: 'System Admin' },
-        { id: 2, username: 'tehsildar1', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Mumbai', pincode: '400001' },
-        { id: 3, username: 'tehsildar2', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Delhi', pincode: '110001' },
-        { id: 4, username: 'tehsildar3', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Kolkata', pincode: '700001' },
-        { id: 5, username: 'tehsildar4', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Chennai', pincode: '600001' },
-        { id: 6, username: 'tehsildar5', password: 'tehsildar123', userType: 'tehsildar', name: 'Tehsildar Hyderabad', pincode: '500001' },
-        { id: 7, username: 'citizen1', password: 'citizen123', userType: 'citizen', name: 'John Doe', pincode: '400001' },
-        { id: 8, username: 'citizen2', password: 'citizen123', userType: 'citizen', name: 'Jane Smith', pincode: '110001' }
-    ];
-    localStorage.setItem('users', JSON.stringify(users));
+// API Base URL
+const API_BASE_URL = 'http://localhost:3000/api';
+
+// API Helper functions
+async function apiRequest(endpoint, options = {}) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const config = {
+        headers: {
+            'Content-Type': 'application/json',
+            ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
+            ...options.headers
+        },
+        ...options
+    };
+
+    try {
+        const response = await fetch(url, config);
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.error || 'API request failed');
+        }
+        
+        return data;
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
 }
 
 // Modal functions
@@ -52,32 +68,35 @@ document.getElementById('regUserType').addEventListener('change', function() {
 });
 
 // Handle login
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
     
     const userType = document.getElementById('userType').value;
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     
-    const user = users.find(u => 
-        u.username === username && 
-        u.password === password && 
-        u.userType === userType
-    );
-    
-    if (user) {
-        currentUser = user;
-        localStorage.setItem('currentUser', JSON.stringify(user));
+    try {
+        const response = await apiRequest('/login', {
+            method: 'POST',
+            body: JSON.stringify({ userType, username, password })
+        });
+        
+        currentUser = response.user;
+        authToken = response.token;
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        localStorage.setItem('authToken', response.token);
+        
         closeLoginModal();
+        await loadDashboardData();
         showDashboard();
         showMessage('Login successful!', 'success');
-    } else {
-        showMessage('Invalid credentials. Please try again.', 'error');
+    } catch (error) {
+        showMessage(error.message || 'Login failed. Please try again.', 'error');
     }
 }
 
 // Handle registration
-function handleRegister(event) {
+async function handleRegister(event) {
     event.preventDefault();
     
     const userType = document.getElementById('regUserType').value;
@@ -86,31 +105,52 @@ function handleRegister(event) {
     const password = document.getElementById('regPassword').value;
     const pincode = document.getElementById('regPincode').value;
     
-    // Check if user already exists
-    const existingUser = users.find(u => u.username === email);
-    if (existingUser) {
-        showMessage('User already exists with this email.', 'error');
-        return;
+    try {
+        const response = await apiRequest('/register', {
+            method: 'POST',
+            body: JSON.stringify({
+                userType,
+                name,
+                email,
+                password,
+                pincode: pincode || null
+            })
+        });
+        
+        closeRegisterModal();
+        showMessage('Registration successful! Please login.', 'success');
+    } catch (error) {
+        showMessage(error.message || 'Registration failed. Please try again.', 'error');
     }
-    
-    const newUser = {
-        id: users.length + 1,
-        username: email,
-        password: password,
-        userType: userType,
-        name: name,
-        pincode: pincode || null
-    };
-    
-    users.push(newUser);
-    localStorage.setItem('users', JSON.stringify(users));
-    
-    closeRegisterModal();
-    showMessage('Registration successful! Please login.', 'success');
+}
+
+// Load dashboard data from API
+async function loadDashboardData() {
+    try {
+        if (currentUser.userType === 'admin') {
+            // Load all users and documents for admin
+            const [usersResponse, documentsResponse, statsResponse] = await Promise.all([
+                apiRequest('/users'),
+                apiRequest('/documents'),
+                apiRequest('/stats')
+            ]);
+            users = usersResponse.users;
+            documents = documentsResponse.documents;
+        } else {
+            // Load documents for citizen/tehsildar
+            const documentsResponse = await apiRequest('/documents');
+            documents = documentsResponse.documents;
+        }
+    } catch (error) {
+        console.error('Error loading dashboard data:', error);
+        showMessage('Error loading dashboard data', 'error');
+    }
 }
 
 // Show dashboard based on user type
-function showDashboard() {
+async function showDashboard() {
+    await loadDashboardData();
+    
     const main = document.querySelector('main');
     
     if (currentUser.userType === 'citizen') {
@@ -329,58 +369,57 @@ function createAdminDashboard() {
 }
 
 // Handle file upload
-function handleFileUpload(event) {
+async function handleFileUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    // Create a FileReader to store the file content
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const newDocument = {
-            id: documents.length + 1,
-            userId: currentUser.id,
-            title: file.name,
-            fileName: file.name,
-            fileContent: e.target.result, // Store the file content
-            fileType: file.type,
-            uploadDate: new Date().toISOString(),
-            status: 'pending',
-            pincode: currentUser.pincode || '400001' // Default pincode
-        };
+    try {
+        const formData = new FormData();
+        formData.append('document', file);
+        formData.append('title', file.name);
         
-        documents.push(newDocument);
-        localStorage.setItem('documents', JSON.stringify(documents));
+        const response = await fetch(`${API_BASE_URL}/documents/upload`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: formData
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || 'Upload failed');
+        }
         
         showMessage('Document uploaded successfully!', 'success');
-        showDashboard(); // Refresh dashboard
-    };
-    
-    reader.readAsDataURL(file); // Read file as base64
+        await showDashboard(); // Refresh dashboard
+    } catch (error) {
+        showMessage(error.message || 'Upload failed. Please try again.', 'error');
+    }
 }
 
 // Verify document (for tehsildar)
-function verifyDocument(docId, status) {
-    const doc = documents.find(d => d.id === docId);
-    if (doc) {
-        doc.status = status;
-        doc.verificationDate = new Date().toISOString();
-        doc.verifiedBy = currentUser.id;
+async function verifyDocument(docId, status) {
+    try {
+        let review = null;
+        let issue = null;
         
         if (status === 'rejected') {
-            const issue = prompt('Please specify the issue:');
-            if (issue) {
-                doc.issue = issue;
-            }
+            issue = prompt('Please specify the issue:');
+            if (!issue) return; // User cancelled
         } else if (status === 'approved') {
-            const review = prompt('Please provide a review comment (optional):');
-            if (review) {
-                doc.review = review;
-            }
+            review = prompt('Please provide a review comment (optional):');
         }
         
-        localStorage.setItem('documents', JSON.stringify(documents));
+        const response = await apiRequest(`/documents/${docId}/verify`, {
+            method: 'PUT',
+            body: JSON.stringify({ status, review, issue })
+        });
+        
         showMessage(`Document ${status}!`, 'success');
-        showDashboard(); // Refresh dashboard
+        await showDashboard(); // Refresh dashboard
+    } catch (error) {
+        showMessage(error.message || 'Verification failed', 'error');
     }
 }
 
@@ -456,7 +495,9 @@ function updateNavigation() {
 // Logout function
 function logout() {
     currentUser = null;
+    authToken = null;
     localStorage.removeItem('currentUser');
+    localStorage.removeItem('authToken');
     location.reload();
 }
 
@@ -515,11 +556,19 @@ function scrollToSection(sectionId) {
 }
 
 // Check if user is already logged in
-window.onload = function() {
+window.onload = async function() {
     const savedUser = localStorage.getItem('currentUser');
-    if (savedUser) {
+    const savedToken = localStorage.getItem('authToken');
+    
+    if (savedUser && savedToken) {
         currentUser = JSON.parse(savedUser);
-        showDashboard();
+        authToken = savedToken;
+        try {
+            await showDashboard();
+        } catch (error) {
+            // Token might be expired, clear and reload
+            logout();
+        }
     }
 };
 
